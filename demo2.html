@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Căn giữa màn hình */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="col-md-6">
+            <h2 class="mb-4">Đăng nhập</h2>
+            <form>
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <input type="text" ng-model="phone" class="form-control" id="username" placeholder="Nhập tên đăng nhập">
+                </div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" ng-model="pass" class="form-control" id="password" placeholder="Nhập mật khẩu">
+                </div>
+                <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

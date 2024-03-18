@@ -1,0 +1,20 @@
+
+<body ng-controller="userController">
+    <div class="container">
+        <div class="col-md-6">
+            <h2 class="mb-4">Đăng nhập</h2>
+            <form ng-submit="login()">
+                <div class="form-group">
+                    <label for="username">Phone</label>
+                    <input type="text" ng-model="user.phone" class="form-control" id="username" placeholder="Nhập tên đăng nhập">
+                </div>
+                <div class="form-group">
+                    <label for="password">Pass</label>
+                    <input type="password" ng-model="user.password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+                </div>
+                <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            </form>
+        </div>
+    </div>
+</body>
+

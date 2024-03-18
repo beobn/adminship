@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html ng-app="fileApp">
+
+<head>
+  <meta charset="utf-8">
+  <title>File Upload, Edit, and Delete Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="MainController">
+  <input type="file" file-model="selectedImage">
+  <img ng-src="{{ imageUrl }}" style="max-width: 300px;">
+
+  <button ng-click="uploadImage()">Upload Image</button>
+  <button ng-click="editImage()">Edit Image</button>
+  <button ng-click="deleteImage()">Delete Image</button>
+
+
+  <script>
+    angular.module('fileApp', [])
+      .directive('fileModel', ['$parse', function($parse) {
+        return {
+          restrict: 'A',
+          link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+            element.bind('change', function() {
+              scope.$apply(function() {
+                modelSetter(scope, element[0].files[0]);
+              });
+            });
+          }
+        };
+      }])
+      .factory('FileService', ['$http', function($http) {
+        return {
+          uploadImage: function(file) {
+            var formData = new FormData();
+            formData.append('image', file);
+
+            return $http.post('/upload', formData, {
+              transformRequest: angular.identity,
+              headers: { 'Content-Type': undefined }
+            });
+          },
+          editImage: function(file) {
+            // Implement image editing logic here
+          },
+          deleteImage: function() {
+            // Implement image deletion logic here
+          }
+        };
+      }])
+      .controller('MainController', ['$scope', 'FileService', function ($scope, FileService) {
+        $scope.uploadImage = function () {
+          if ($scope.selectedImage) {
+            FileService.uploadImage($scope.selectedImage)
+              .then(function(response) {
+                console.log('Upload successful:', response.data);
+                $scope.imageUrl = response.data.imageUrl; // Store uploaded image URL
+              })
+              .catch(function(error) {
+                console.error('Upload failed:', error);
+              });
+          } else {
+            console.log("No image selected.");
+          }
+        };
+
+        $scope.editImage = function () {
+          if ($scope.selectedImage) {
+            FileService.editImage($scope.selectedImage)
+              .then(function(response) {
+                console.log('Image edited:', response.data);
+                $scope.imageUrl = response.data.imageUrl; // Update image URL
+              })
+              .catch(function(error) {
+                console.error('Editing failed:', error);
+              });
+          } else {
+            console.log("No image selected.");
+          }
+        };
+
+        $scope.deleteImage = function () {
+          FileService.deleteImage()
+            .then(function(response) {
+              console.log('Image deleted:', response.data);
+              $scope.imageUrl = null; // Clear image URL
+            })
+            .catch(function(error) {
+              console.error('Deletion failed:', error);
+            });
+        };
+      }]);
+  </script>
+</body>
+
+</html>

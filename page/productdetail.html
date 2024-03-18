@@ -1,0 +1,167 @@
+
+<main ng-controller="productdetailController">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Chi Tiết Sản Phẩm</h1>
+    </div>
+  
+    <div class="row">
+  
+      <!-- Area Chart -->
+      <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+          <!-- Card Header - Dropdown -->
+          <div
+                  class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Nhập thông tin</h6>
+          </div>
+          <!-- Card Body nhập thông tin -->
+          <div class="card-body">
+            <div class="chart-area" style="height: 100%">
+              <div class="mb-3">
+                <label for="" class="form-label">Chọn cửa hàng bạn muốn thêm sản phẩm</label>
+                <input type="text" id="myInput" class="form-control" ng-model="inputValueMerchanrt" ng-change="onInputChange(0)" placeholder="Nhập tên cửa hàng bạn muốn chọn và chọn nó ở bên dưới"> 
+                <small id="helpId" class="text-danger" ng-show="ValiDateService.validateNullText(merchant.name)"
+                ><b>Chọn 1 cửa hàng bên dưới</b></small>
+                <!-- Kết quả gợi ý sẽ được hiển thị trong phần này -->
+                <ul class="list-group mt-2" ng-show="ValiDateService.validateNullText(merchant.name)">
+                  <li class="list-group-item list-group-item-action" ng-repeat="option in listMerchants" ng-click="onOptionSelect(0,option.id)">{{ option.name }}</li>
+                </ul>
+              </div>
+              <div class="mb-3">
+                <label for="" class="form-label">Chọn sản phẩm bạn muốn thêm</label>
+                <input type="text" id="myInput" class="form-control" ng-model="inputValueProduct" ng-change="onInputChange(1)" placeholder="Nhập sản phẩm bạn muốn chọn và chọn nó ở bên dưới"> 
+                <small id="helpId" class="text-danger" ng-show="ValiDateService.validateNullText(product.name)"
+                ><b>Chọn 1 sản phẩm bên dưới</b></small>
+                <!-- Kết quả gợi ý sẽ được hiển thị trong phần này -->
+                <ul class="list-group mt-2" ng-show="ValiDateService.validateNullText(product.name)">
+                  <li class="list-group-item list-group-item-action" ng-repeat="option in listProduct" ng-click="onOptionSelect(1,option.id)">{{ option.name }}</li>
+                </ul>
+              </div>
+              <div class="mb-3">
+                <label for="" class="form-label">Sản phẩm của bạn có phân loại size không</label>
+                <select class="custom-select" ng-model="yesNoSize">
+                  <option value="1">Không</option>
+                  <option value="2">Có</option>
+                </select>
+              </div>
+              <label for="basic-url">Nhập giá tiền</label> <br>
+              <small id="helpId" class="text-danger" ng-show="ValiDateService.validatePrice(price1) || (ValiDateService.validatePrice(price2)&&yesNoSize=='2')"
+                  ><b>Không được bỏ trống và nhập từ 1.000 đến 1.000.000</b></small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend" ng-show="yesNoSize=='2'">
+                  <span class="input-group-text">Size vừa</span>
+                </div>
+                <input type="number" ng-model="price1" class="form-control" placeholder="Nhập giá tiền ở đây">
+                <div class="input-group-prepend" ng-show="yesNoSize=='2'">
+                  <span class="input-group-text">Size lớn</span>
+                </div>
+                <input type="number" ng-model="price2" class="form-control" placeholder="Nhập giá tiền ở đây" ng-show="yesNoSize=='2'">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">VNĐ</span>
+                </div>
+              </div>
+              <button type="button" class="btn btn-success" ng-click="add()">Thêm mới</button>
+              <button type="button" class="btn btn-warning" ng-click="update()">Cập nhật</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Pie Chart -->
+      <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+          <!-- Card Header - Dropdown -->
+          <div
+                  class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Hình ảnh hiển thị</h6>
+          </div>
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="chart-pie pt-4 pb-2" >
+              <div class="mb-4 d-flex justify-content-center" style="height: 70%">
+                <img class="img-fluid rounded" ng-src="{{selectedImage}}"
+                     alt="example placeholder"  />
+  
+              </div>
+              <div class="d-flex justify-content-center">
+                <div class="btn btn-primary btn-rounded">
+                  <label class="form-label text-white m-1" for="customFile1">Sửa ảnh</label>
+                  <input type="file" class="form-control d-none" id="customFile1" file-model="selectedFile" />
+                </div>
+              </div>
+  
+            </div>
+  
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4" style="width: 100%">
+      <div class="card-header py-3 ">
+        <h6 class="m-0 font-weight-bold text-primary">Bảng dữ liệu</h6>
+        <div class="input-group" style="margin-top: 10px">
+          <input type="text" class="form-control bg-white border-0 small" placeholder="Tìm Kiếm..."
+                 aria-label="Search" aria-describedby="basic-addon2" ng-model="searchName">
+          <div class="input-group-append" ng-click="showDataTable(0)">
+            <button class="btn btn-primary" type="button" >
+              <i class="fas fa-search fa-sm" ></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+  
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+            <tr>
+              <th>Id</th>
+              <th>Tên Cửa Hàng</th>
+              <th>Tên Sản Phẩm</th>
+              <th>Size</th>
+              <th>Giá Tiền</th>
+              <th>Trạng Thái</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="dta in dataTable" ng-click="clickTable(dta.id)">
+              <td>{{dta.id}}</td>      
+              <td>{{dta.merchants.name}}</td>
+              <td>{{dta.product.name}}</td>
+              <td>{{dta.size == 1? 'Vừa' : 'Vừa & Lớn'}}</td>
+              <td ng-show="dta.size==1">{{dta.price1| number:0}} VNĐ</td>
+              <td ng-show="dta.size==2">{{dta.price1| number:0}} - {{dta.price2| number:0}} VNĐ</td>
+              <td>{{dta.status==0 ? 'Hoạt Động':'Ẩn'}}</td>
+            </tr>
+  
+            </tbody>
+          </table>
+          <div class="row">
+  
+            <div class="col-sm-12 col-md-12">
+              <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+                <ul class="pagination justify-content-center">
+                  <li class="paginate_button page-item previous " id="dataTable_previous"
+                      ng-click="showDataTable(indexPage-1)">
+                    <a href="" aria-controls="dataTable" class="page-link">&laquo;</a>
+                  </li>
+                  <li class="paginate_button page-item active">
+                    <a href="" aria-controls="dataTable"  class="page-link">{{totalPages==0||totalPages==indexPage?indexPage:indexPage+1}}/{{totalPages}}</a>
+                  </li>
+                  <li class="paginate_button page-item next" id="dataTable_next"
+                      ng-click="showDataTable(indexPage+1)">
+                    <a href="" aria-controls="dataTable"  class="page-link">&raquo;</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  
+  </main>
+  

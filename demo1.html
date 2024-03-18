@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Selected Image</title>
+</head>
+<body>
+    <div ng-app="myApp" ng-controller="myController">
+        <input type="file" file-model="selectedFile" id="imageInput">
+        <img ng-src="{{ selectedImage }}" alt="Selected Image" height="200px" ng-if="selectedImage">
+        <button ng-click="upload()"> submit</button>
+        <button ng-click="delete()"> delete</button>
+        <button ng-click="tachchuoi()"> tac</button>
+    </div>
+
+    <!-- Add AngularJS library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+
+    <script>
+        angular.module('myApp', [])
+            .controller('myController', ['$scope','$http', function($scope,$http) {
+                $scope.upload=function(){
+                    let url=`https://api.imgur.com/3/image/`;
+                    let headers= {
+                        Authorization: "Client-ID 1a59785c78e8a37",
+                        Authorization: "Bearer 9132858822507571b98f823d680fedbc397f7099"
+                    };
+                    var formData = new FormData();
+                    console.log($scope.selectedFile);
+                    formData.append("image", $scope.selectedFile);
+                    console.log($scope.selectedFile);
+                    fetch("https://api.imgur.com/3/image/", {
+                        method: "post",
+                        headers: {
+                            Authorization: "Client-ID 1a59785c78e8a37",
+                            Authorization: "Bearer 9132858822507571b98f823d680fedbc397f7099"
+                        },
+                        body: formData
+                    }).then(data => data.json()).then(data => {
+                        console.log(data);
+                    })
+                }
+                $scope.delete=function(){
+                    fetch("https://api.imgur.com/3/image/Qjod2px", {
+                        method: "delete",
+                        headers: {
+                            Authorization: "Client-ID 1a59785c78e8a37",
+                            Authorization: "Bearer 9132858822507571b98f823d680fedbc397f7099"
+                        }
+                    }).then(data => data.json()).then(data => {
+                        console.log(data);
+                    })
+                }
+
+                $scope.tachchuoi=function(){
+                    const url = "https://i.imgur.com/ZRXPZdX.jpg";
+
+                    // Tìm vị trí của ký tự '/'
+                    const lastSlashIndex = url.lastIndexOf('/');
+
+                    // Tìm vị trí của ký tự '.' sau ký tự '/'
+                    const dotAfterLastSlashIndex = url.indexOf('.', lastSlashIndex);
+
+                    // Lấy chuỗi con sau ký tự '/'
+                    const desiredString = url.substring(lastSlashIndex + 1, dotAfterLastSlashIndex);
+
+                    console.log(desiredString); // In ra "WKoLRFH"
+
+                }
+
+                $scope.$watch('selectedFile', function(newVal, oldVal) {
+                    if (newVal !== oldVal) {
+                        displaySelectedImage();
+                    }
+                });
+
+
+
+                function displaySelectedImage() {
+                    if ($scope.selectedFile) {
+                        var reader = new FileReader();
+                        reader.onload = function(event) {
+                            $scope.$apply(function() {
+                                $scope.selectedImage = event.target.result;
+                            });
+                        };
+                        reader.readAsDataURL($scope.selectedFile);
+                    } else {
+                        $scope.selectedImage = null;
+                    }
+                }
+            }])
+            .directive('fileModel', ['$parse', function($parse) {
+                return {
+                    restrict: 'A',
+                    link: function(scope, element, attrs) {
+                        var model = $parse(attrs.fileModel);
+                        var modelSetter = model.assign;
+                        element.bind('change', function() {
+                            scope.$apply(function() {
+                                modelSetter(scope, element[0].files[0]);
+                            });
+                        });
+                    }
+                };
+            }]);
+    </script>
+</body>
+</html>
