@@ -183,7 +183,7 @@ app.service('TimeConversionService', function() {
 
     var hours = date.getHours().toString().padStart(2, '0');
     var minutes = date.getMinutes().toString().padStart(2, '0');
-    return hours + ':' + minutes+':00';
+    return hours + ':' + minutes;
   };
 });
 app.controller('myAppController', function($window,$rootScope,$location, ValiDateService) {

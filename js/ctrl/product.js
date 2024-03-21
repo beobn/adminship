@@ -1,7 +1,7 @@
 
 app.controller("productController", function ($rootScope,$scope, $http,url,SwalService,FileService) {
 
-    const urlAPI=url.host+"admin/rest/product";
+    const urlAPI=url.host+"/types";
     $scope.selectedImage=url.imgdf;
     $scope.searchName='';
     $scope.indexPage = 0;
@@ -18,11 +18,10 @@ app.controller("productController", function ($rootScope,$scope, $http,url,SwalS
         if(index<0){
             $scope.indexPage=$scope.totalPages-1;
         }
-        var urlGetDataTable = urlAPI+`/getall/` + $scope.indexPage+`?seach=`+$scope.searchName;
-        $http.get(urlGetDataTable).then(function (response) {
+        var urlGetDataTable = urlAPI+`/?page=` + $scope.indexPage+`&size=10&query=like(name,'`+$scope.searchName+`')`;
+        $http.get(urlGetDataTable,$rootScope.userLogin.accessToken).then(function (response) {
             $scope.dataTable = response.data.data;
-            $scope.totalPages = response.data.data.total_page;
-            console.log($scope.totalPages);
+            $scope.totalPages = response.data.total_page;
         }).catch(error => {
             console.log(error);
         });
@@ -59,41 +58,31 @@ app.controller("productController", function ($rootScope,$scope, $http,url,SwalS
                 // Thực hiện hành động khi người dùng chọn "Xác Nhận"
                 let data = angular.copy($scope.product);
                 if($scope.validate(data)){
-                    data.id = null;
+                    delete data.id;
                     //upload ảnh
                     SwalService.showProcessing();
                     FileService.uploadImage($scope.selectedFile)
                         .then(function(response) {
-                            data.image=response.data.data.link;
-                            var urlsave = urlAPI+`/save`;
-                            $http.post(urlsave, data).then(resp => {
+                            data.images=response.data.object;
+                            var urlsave = urlAPI+`/`;
+                            $http.post(urlsave, data,{
+                                headers: {
+                                    token: $rootScope.userLogin.accessToken
+                                }
+                            }).then(resp => {
                                 setTimeout(() => {
                                     SwalService.showSuccessAlert('Thêm Mới Thành Công');
-                                    $scope.clear();
+                                    // $scope.clear();
                                 }, 10);
                             })
                             .catch(error => {
                                 console.log(error);
-                                SwalService.showErrorAlert(error.data.message);
+                                SwalService.showErrorAlert(error.data.description);
                             })
                         })
                         .catch(function(error) {
-                            if($scope.selectedImage==url.imgdf){
-                                data.image=null;
-                            }else{
-                                data.image=$scope.selectedImage;
-                            }
-                            var urlsave = urlAPI+`/save`;
-                            $http.post(urlsave, data).then(resp => {
-                                setTimeout(() => {
-                                    SwalService.showSuccessAlert('Thêm Mới Thành Công');
-                                    $scope.clear();
-                                }, 10);
-                            })
-                            .catch(error => {
-                                console.log(error);
-                                SwalService.showErrorAlert(error.data.message);
-                            })
+                            SwalService.showErrorAlert('Lỗi ảnh');
+                            console.log(error);
                         });
                     //end upload ảnh
                 }

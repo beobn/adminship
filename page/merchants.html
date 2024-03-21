@@ -52,11 +52,21 @@
               </div>
               <div class="mb-3">
                 <label for="" class="form-label">Giờ mở cửa</label>
-                <input type="time" class="form-control" ng-model="merchant.timeopen">
+                <input type="time" class="form-control" ng-model="merchant.time_open">
               </div>
               <div class="mb-3">
                 <label for="" class="form-label">Giờ đóng cửa</label>
-                <input type="time" class="form-control" ng-model="merchant.timeclose">
+                <input type="time" class="form-control" ng-model="merchant.time_close">
+              </div>
+              <div class="mb-3">
+                <label for="" class="form-label">Chọn loại cửa hàng</label>
+                <input type="text" id="myInput" class="form-control" ng-model="inputValueType" ng-change="onInputChange()" placeholder="Nhập phân loại bạn muốn chọn và chọn nó ở bên dưới"> 
+                <small id="helpId" class="text-danger" ng-show="ValiDateService.validateNullText(merchant.type)"
+                ><b>Chọn 1 sản phẩm bên dưới</b></small>
+                <!-- Kết quả gợi ý sẽ được hiển thị trong phần này -->
+                <ul class="list-group mt-2">
+                  <li class="list-group-item list-group-item-action" ng-repeat="option in listTypes" ng-click="onOptionSelect(1,option.id)">{{ option.name }}</li>
+                </ul>
               </div>
               <button type="button" class="btn btn-success" ng-click="add()">Thêm mới</button>
               <button type="button" class="btn btn-warning" ng-click="update()">Cập nhật</button>

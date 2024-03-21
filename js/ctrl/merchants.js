@@ -1,13 +1,14 @@
 app.controller("merchantsController", function ($rootScope,$scope, $http,url,FileService,TimeConversionService,SwalService) {
     const urlAPI=url.host+"/shops";
+    const urlType=url.host+"/types";
     $scope.selectedImage=url.imgdf;
     $scope.indexPage = 0;
     $scope.searchName='';
     $scope.totalPages= 0 ;
     $scope.merchant={};
     $scope.showDataTable = function (index) {
-        $scope.merchant.timeopen= TimeConversionService.convertToDateTime();
-        $scope.merchant.timeclose= TimeConversionService.convertToDateTime();
+        $scope.merchant.time_open= TimeConversionService.convertToDateTime();
+        $scope.merchant.time_close= TimeConversionService.convertToDateTime();
         $scope.dataTable = [];
         $scope.indexPage=index;
         if(index>$scope.totalPages-1){
@@ -27,6 +28,20 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
     }
     $scope.showDataTable(0);
 
+    $scope.showOption = function () {
+        $scope.listTypes = [];
+        if($scope.inputValueType == undefined){
+            $scope.inputValueType ="";
+        }
+        var urlGetData = urlType+`/?query=like(name,"`+$scope.inputValueType+`")`
+        $http.get(urlGetData,$rootScope.userLogin.accessToken).then(function (response) {
+            $scope.listTypes = response.data.data;
+            console.log($scope.listTypes);
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+    $scope.showOption();
     $scope.clickTable=function (index){
         var urlDataTableclick= urlAPI+`/`+index;
         $http.get(urlDataTableclick,$rootScope.userLogin.accessToken).then(function (response) {
@@ -37,8 +52,8 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
             }else{
                 $scope.selectedImage=url.imgdf;
             }
-            $scope.merchant.timeopen= TimeConversionService.convertToDateTime(response.data.time_open);
-            $scope.merchant.timeclose= TimeConversionService.convertToDateTime(response.data.time_close);
+            $scope.merchant.time_open= TimeConversionService.convertToDateTime(response.data.time_open);
+            $scope.merchant.time_close= TimeConversionService.convertToDateTime(response.data.time_close);
             window.scrollTo(0, 0);
         }).catch(error => {
             console.log(error);
@@ -73,23 +88,38 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
     $scope.add=function () {
         SwalService.showConfirmation('Xác nhận thêm mới', function (confirmed) {
             if (confirmed) {
-                let data = angular.copy($scope.merchant);
-                if($scope.validate(data)){
-                    SwalService.showProcessing();
-                    data.id=null;
-                    data.timeclose=TimeConversionService.convertToDate(new Date($scope.merchant.timeclose));
-                    data.timeopen=TimeConversionService.convertToDate(new Date($scope.merchant.timeopen));
-                    var urlsave = urlAPI+`/save`;
-                    $http.post(urlsave, data).then(resp => {
-                        setTimeout(() => {
-                            SwalService.showSuccessAlert('Thêm Mới Thành Công');
-                            $scope.clear();
-                        }, 10);
+                let datamer = angular.copy($scope.merchant);
+                if($scope.validate(datamer)){
+                    FileService.uploadImage($scope.selectedFile)
+                    .then(function(response) {
+                        SwalService.showProcessing();
+                        console.log(response);
+                        datamer.images=response.data.object;
+                        datamer.time_close=TimeConversionService.convertToDate(new Date($scope.merchant.time_close));
+                        datamer.time_open=TimeConversionService.convertToDate(new Date($scope.merchant.time_open));
+                        delete datamer.type;
+                        delete datamer.id;
+                        var urlsave = urlAPI+'/';
+                        console.log(datamer);
+                        $http.post(urlsave, datamer,{
+                            headers: {
+                                token: $rootScope.userLogin.accessToken
+                            }
+                        }).then(resp => {
+                            setTimeout(() => {
+                                SwalService.showSuccessAlert('Thêm Mới Thành Công');
+                                $scope.clear();
+                            }, 10);
+                        })
+                        .catch(function(error) {
+                            SwalService.showErrorAlert(error.description)
+                            console.log(error);
+                        });
                     })
-                    .catch(error => {
-                        console.log(error)
-                        SwalService.showErrorAlert(error.data.message);
-                    })
+                    .catch(function(error) {
+                        SwalService.showErrorAlert('Lỗi tải ảnh hãy thử lại')
+                        console.log(error);
+                    });
 
                 }
             }
