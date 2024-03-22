@@ -42,6 +42,18 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
         });
     }
     $scope.showOption();
+    
+    $scope.onOptionSelect= function(index){
+        $scope.inputValueType=index.name;
+        $scope.merchant.type=[index.id];
+        $scope.listTypes = [];
+    }
+
+    $scope.onInputChange=function () {
+        $scope.showOption();
+        $scope.merchant.type=[];
+    }
+    
     $scope.clickTable=function (index){
         var urlDataTableclick= urlAPI+`/`+index;
         $http.get(urlDataTableclick,$rootScope.userLogin.accessToken).then(function (response) {
@@ -97,7 +109,6 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
                         datamer.images=response.data.object;
                         datamer.time_close=TimeConversionService.convertToDate(new Date($scope.merchant.time_close));
                         datamer.time_open=TimeConversionService.convertToDate(new Date($scope.merchant.time_open));
-                        delete datamer.type;
                         delete datamer.id;
                         var urlsave = urlAPI+'/';
                         console.log(datamer);

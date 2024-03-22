@@ -65,7 +65,7 @@
                 ><b>Chọn 1 sản phẩm bên dưới</b></small>
                 <!-- Kết quả gợi ý sẽ được hiển thị trong phần này -->
                 <ul class="list-group mt-2">
-                  <li class="list-group-item list-group-item-action" ng-repeat="option in listTypes" ng-click="onOptionSelect(1,option.id)">{{ option.name }}</li>
+                  <li class="list-group-item list-group-item-action" ng-repeat="option in listTypes" ng-click="onOptionSelect(option)">{{ option.name }}</li>
                 </ul>
               </div>
               <button type="button" class="btn btn-success" ng-click="add()">Thêm mới</button>

@@ -30,11 +30,16 @@ app.controller("productController", function ($rootScope,$scope, $http,url,SwalS
 
 
     $scope.clickTable=function (index){
-        var urlDataTableclick= urlAPI+`/find_id?id=`+index;
-        $http.get(urlDataTableclick).then(function (response) {
+        var urlDataTableclick= urlAPI+`/`+index;
+        $http.get(urlDataTableclick,{
+            headers: {
+                token: $rootScope.userLogin.accessToken
+            }
+        }).then(function (response) {
             $scope.product = response.data;
-            if(response.data.image != null){
-                $scope.selectedImage=response.data.image
+            console.log($scope.product);
+            if(response.data.images != null){
+                $scope.selectedImage=response.data.images.link
             }else{
                 $scope.selectedImage=url.imgdf;
             }
@@ -46,7 +51,7 @@ app.controller("productController", function ($rootScope,$scope, $http,url,SwalS
 
     $scope.validate=function(data){
         if($rootScope.ValiDateService.validateNullText(data.name)){
-            SwalService.showErrorAlert("Tên sản phẩm không được bỏ trống!");
+            SwalService.showErrorAlert("Tên phân loại không được bỏ trống!");
             return false;
         }
         return true;
