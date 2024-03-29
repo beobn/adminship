@@ -61,7 +61,7 @@
               <div class="mb-3">
                 <label for="" class="form-label">Chọn loại cửa hàng</label>
                 <input type="text" id="myInput" class="form-control" ng-model="inputValueType" ng-change="onInputChange()" placeholder="Nhập phân loại bạn muốn chọn và chọn nó ở bên dưới"> 
-                <small id="helpId" class="text-danger" ng-show="ValiDateService.validateNullText(merchant.type)"
+                <small id="helpId" class="text-danger" ng-show="ValiDateService.validateNullText(merchant.type[0])"
                 ><b>Chọn 1 sản phẩm bên dưới</b></small>
                 <!-- Kết quả gợi ý sẽ được hiển thị trong phần này -->
                 <ul class="list-group mt-2">

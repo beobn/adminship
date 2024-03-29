@@ -58,12 +58,14 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
         var urlDataTableclick= urlAPI+`/`+index;
         $http.get(urlDataTableclick,$rootScope.userLogin.accessToken).then(function (response) {
             $scope.merchant = response.data;
-            console.log(response.data);
+            console.log($scope.merchant);
+            $scope.inputValueType = response.data.type[0].name
             if(response.data.images != null){
                 $scope.selectedImage=response.data.images.link
             }else{
                 $scope.selectedImage=url.imgdf;
             }
+            $scope.listTypes = []
             $scope.merchant.time_open= TimeConversionService.convertToDateTime(response.data.time_open);
             $scope.merchant.time_close= TimeConversionService.convertToDateTime(response.data.time_close);
             window.scrollTo(0, 0);
@@ -110,6 +112,7 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
                         datamer.time_close=TimeConversionService.convertToDate(new Date($scope.merchant.time_close));
                         datamer.time_open=TimeConversionService.convertToDate(new Date($scope.merchant.time_open));
                         delete datamer.id;
+                        delete datamer.type.name;
                         var urlsave = urlAPI+'/';
                         console.log(datamer);
                         $http.post(urlsave, datamer,{
@@ -146,48 +149,39 @@ app.controller("merchantsController", function ($rootScope,$scope, $http,url,Fil
             let data= angular.copy( $scope.merchant);
             data.time_close=TimeConversionService.convertToDate(new Date($scope.merchant.time_close));
             data.time_open=TimeConversionService.convertToDate(new Date($scope.merchant.time_open));
-            // if($scope.validate(data)){
+            if($scope.validate(data)){
                 //upload ảnh
                 SwalService.showProcessing();
-                FileService.uploadImage($scope.selectedFile)
-                    .then(function(response) {
-                        console.log(response);
-                        
-                        data.images=response.data.data.id;
-                        console.log(data.images);
-                        // var urlsave = urlAPI+`/save`;
-                        // $http.post(urlsave, data).then(resp => {
-                        //     setTimeout(() => {
-                        //         SwalService.showSuccessAlert('Cập Nhật Thành Công');
-                        //         $scope.clear();
-                        //     }, 10);
-                        // })
-                        // .catch(error => {
-                        //     console.log(error);
-                        //     SwalService.showErrorAlert(error.data.message);
-                        // })
-                    })
-                    .catch(function(error) {
-                        // if($scope.selectedImage==url.imgdf){
-                        //     data.image=null;
-                        // }else{
-                        //     data.image=$scope.selectedImage;
-                        // }
-                        // var urlsave = urlAPI+`/save`;
-                        // $http.post(urlsave, data).then(resp => {
-                        //     setTimeout(() => {
-                        //         SwalService.showSuccessAlert('Cập Nhật Thành Công');
-                        //         $scope.clear();
-                        //     }, 10);
-                        // })
-                        // .catch(error => {
-                        //     console.log(error);
-                        //     SwalService.showErrorAlert(error.data.message);
-                        // })
-                        console.log(error);
-                    });
-                    //upload ảnh end
-                // }
+                if($scope.selectedFile==undefined){
+                    data.images = $scope.merchant.images.object;
+                }else{
+                    FileService.uploadImage($scope.selectedFile)
+                        .then(function(response) {
+                            data.images=response.data.object;
+                        })
+                        .catch(function(error) {
+                            SwalService.showErrorAlert("Lỗi chưa chọn ảnh");
+                            console.log(error);
+                        });
+                        //upload ảnh end
+                    }
+                }
+                data.type = [$scope.merchant.type[0].id];
+                var urlsave = urlAPI+`/`+data.id;
+                $http.put(urlsave,data,{
+                    headers: {
+                        token: $rootScope.userLogin.accessToken
+                    },
+                }).then(resp => {
+                    setTimeout(() => {
+                        SwalService.showSuccessAlert('Cập Nhật Thành Công');
+                        $scope.clear();
+                    }, 10);
+                })
+                .catch(error => {
+                    console.log(error);
+                    SwalService.showErrorAlert(error.data.description);
+                })
             }
         });
     };
